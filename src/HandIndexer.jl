@@ -3,7 +3,7 @@ module HandIndexer
 export round_size, hand_index, hand_unindex, hand_unindex!,
         perfect_recall, imperfect_recall, flop_recall, imperfect_board_recall
 
-using HandIndexer_jll
+using HandIndexer_jll, PlayingCards
 import Base.@propagate_inbounds
 
 const lib = HandIndexer_jll.HandIndexer
@@ -64,32 +64,34 @@ end
 
 const cards_g = [Vector{UInt8}(undef, 52 + 64) for _ in 1:Threads.nthreads()]
 
-@propagate_inbounds function hand_index(indexer_ref, round, cards)
+@propagate_inbounds function hand_index(indexer_ref, round, cards::Vector{Card})
     thread = Threads.threadid()
     thread_cards_buffer = cards_g[thread]
     num_cards = length(cards)
     for i in 1:num_cards
-        thread_cards_buffer[i] = cards[i] - 1
+        thread_cards_buffer[i] = cards[i].val - 1
     end
     indexer = indexer_ref[]
     ptr = indexer.indexers[round].ptr
     return 1 + @ccall lib.hand_index_last(ptr::Ptr{hand_indexer_t}, thread_cards_buffer::Ptr{UInt8})::UInt64
 end
 
-@propagate_inbounds function hand_unindex!(indexer_ref, round, index, output::Vector{UInt8})
+@propagate_inbounds function hand_unindex!(indexer_ref, round, index, output::Vector{Card})
     indexer = indexer_ref[]
     ptr = indexer.indexers[round].ptr
     r = length(indexer.cards_per_round_per_round[round]) - 1
     result = @ccall lib.hand_unindex(ptr::Ptr{hand_indexer_t}, r::UInt32, (index-1)::UInt64, output::Ptr{UInt8})::Cuchar
     @assert(result > 0)
-    output .+= 1
+    for i in 1:length(output)
+        output[i] = Card(output[i].val + 1)
+    end
     return nothing
 end
 
 @propagate_inbounds function hand_unindex(indexer_ref, round, index)
     indexer = indexer_ref[]
     num_cards = sum(indexer.cards_per_round_per_round[round])
-    hand = Vector{UInt8}(undef, num_cards)
+    hand = Vector{Card}(undef, num_cards)
     hand_unindex!(indexer_ref, round, index, hand)
     return hand
 end

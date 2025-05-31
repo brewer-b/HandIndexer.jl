@@ -2,7 +2,7 @@
 
 julia_version = "1.11.5"
 manifest_format = "2.0"
-project_hash = "7939cfbc2c715560e20877274701fdfd16931957"
+project_hash = "b256bdf5464900e0d801b78d5501e656a6be1e77"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -48,6 +48,13 @@ version = "1.11.0"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
+
+[[deps.PlayingCards]]
+git-tree-sha1 = "b14dc7506d6eaa94bf3fcd446c1b7bac45f34d2b"
+repo-rev = "main"
+repo-url = "https://github.com/brewer-b/PlayingCards.jl"
+uuid = "a9994b6a-d280-4708-9be4-3391e8077a39"
+version = "0.1.0"
 
 [[deps.Preferences]]
 deps = ["TOML"]

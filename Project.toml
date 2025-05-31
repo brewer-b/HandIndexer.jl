@@ -5,8 +5,10 @@ version = "0.1.0"
 
 [deps]
 HandIndexer_jll = "e5e9e4f2-2d88-5ee2-9cba-2c81ca7a2e18"
+PlayingCards = "a9994b6a-d280-4708-9be4-3391e8077a39"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 HandIndexer_jll = "0.0.1"
+PlayingCards = "0.1.0"
 Test = "1.11.0"
