@@ -62,18 +62,14 @@ const imperfect_board_recall = Ref{HandIndexers}()
     return @ccall lib.hand_indexer_size(ptr::Ptr{hand_indexer_t}, r::UInt32)::UInt64
 end
 
-const cards_g = [Vector{UInt8}(undef, 52 + 64) for _ in 1:Threads.nthreads()]
-
 @propagate_inbounds function hand_index(indexer_ref, round, cards::Vector{Card})
-    thread = Threads.threadid()
-    thread_cards_buffer = cards_g[thread]
-    num_cards = length(cards)
-    for i in 1:num_cards
-        thread_cards_buffer[i] = cards[i].val - 1
+    cards_buffer = Vector{Card}(undef, length(cards))
+    for i in 1:length(cards)
+        cards_buffer[i] = Card(cards[i].val - 1)
     end
     indexer = indexer_ref[]
     ptr = indexer.indexers[round].ptr
-    return 1 + @ccall lib.hand_index_last(ptr::Ptr{hand_indexer_t}, thread_cards_buffer::Ptr{UInt8})::UInt64
+    return 1 + @ccall lib.hand_index_last(ptr::Ptr{hand_indexer_t}, cards_buffer::Ptr{UInt8})::UInt64
 end
 
 @propagate_inbounds function hand_unindex!(indexer_ref, round, index, output::Vector{Card})
